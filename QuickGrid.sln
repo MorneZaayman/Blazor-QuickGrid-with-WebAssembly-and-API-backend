@@ -7,6 +7,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "QuickGrid.API", "QuickGrid.
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "QuickGrid.Shared", "QuickGrid.Shared\QuickGrid.Shared.csproj", "{FA793366-5BF3-401D-969A-4995268DA0C5}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "QuickGrid.Web", "QuickGrid.Web\QuickGrid.Web.csproj", "{05988925-552B-461E-8F4B-184B3A2A4DE5}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -21,6 +23,10 @@ Global
 		{FA793366-5BF3-401D-969A-4995268DA0C5}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{FA793366-5BF3-401D-969A-4995268DA0C5}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{FA793366-5BF3-401D-969A-4995268DA0C5}.Release|Any CPU.Build.0 = Release|Any CPU
+		{05988925-552B-461E-8F4B-184B3A2A4DE5}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{05988925-552B-461E-8F4B-184B3A2A4DE5}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{05988925-552B-461E-8F4B-184B3A2A4DE5}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{05988925-552B-461E-8F4B-184B3A2A4DE5}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
