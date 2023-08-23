@@ -17,7 +17,17 @@
 }
 else
 {
-     <QuickGrid Items="@customers">
+    <div>
+        Items per page:
+        <select @bind="@paginationState.ItemsPerPage">
+            <option>5</option>
+            <option>10</option>
+            <option>20</option>
+            <option>50</option>
+        </select>
+    </div>
+
+    <QuickGrid Items="@customers" Pagination="@paginationState">
         <TemplateColumn Title="Avatar">
             <img width="50" src="@context.Avatar" alt="Customer avatar" />
         </TemplateColumn>
@@ -25,13 +35,49 @@ else
         <PropertyColumn Property="@(p => p.EmailAddress)" />
         <PropertyColumn Property="@(p => p.UserName)" />
     </QuickGrid>
+
+    <div class="text-center">
+        <div class="btn-group">
+            @if (paginationState.TotalItemCount.HasValue)
+            {
+                if (paginationState.CurrentPageIndex > 0)
+                {
+                    <button class="btn btn-primary" @onclick="@(() => paginationState.SetCurrentPageIndexAsync(0))">
+                        &lt;&lt;
+                    </button>
+
+                    <button class="btn btn-primary" @onclick="@(() => paginationState.SetCurrentPageIndexAsync(paginationState.CurrentPageIndex - 1))">
+                        &lt;
+                    </button>
+                }
+
+                <button class="btn btn-outline-primary">
+                    @(paginationState.CurrentPageIndex + 1)
+                </button>
+
+                if (paginationState.CurrentPageIndex < paginationState.LastPageIndex)
+                {
+                    <button class="btn btn-primary" @onclick="@(() => paginationState.SetCurrentPageIndexAsync(paginationState.CurrentPageIndex + 1))">
+                        &gt;
+                    </button>
+
+                    <button class="btn btn-primary" @onclick="@(() => paginationState.SetCurrentPageIndexAsync(paginationState.LastPageIndex.GetValueOrDefault()))">
+                        &gt;&gt;
+                    </button>
+                }
+            
+            }
+        </div>
+    </div>
 }
 
 @code {
+    private PaginationState paginationState = new PaginationState { ItemsPerPage = 10 };
     private IQueryable<Customer>? customers;
 
     protected override async Task OnInitializedAsync()
     {
         customers = Queryable.AsQueryable(await Http.GetFromJsonAsync<List<Customer>>("https://localhost:7111/Customer"));
+        paginationState.TotalItemCountChanged += (sender, eventArgs) => StateHasChanged();
     }
 }
