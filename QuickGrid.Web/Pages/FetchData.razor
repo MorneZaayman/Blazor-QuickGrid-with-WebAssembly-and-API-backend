@@ -27,7 +27,7 @@ else
         </select>
     </div>
 
-    <QuickGrid Items="@customers" Pagination="@paginationState">
+    <QuickGrid Items="@customers" Pagination="@paginationState" Virtualize="true">
         <TemplateColumn Title="Avatar">
             <img width="50" src="@context.Avatar" alt="Customer avatar" />
         </TemplateColumn>
