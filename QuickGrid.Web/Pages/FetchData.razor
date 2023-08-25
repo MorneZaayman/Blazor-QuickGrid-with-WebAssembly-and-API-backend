@@ -31,17 +31,17 @@ else
         <TemplateColumn Title="Avatar">
             <img width="50" src="@context.Avatar" alt="Customer avatar" />
         </TemplateColumn>
-        <PropertyColumn Property="@(p => p.Name)">
+        <PropertyColumn Property="@(p => p.Name)" Sortable="true">
             <ColumnOptions>
                 <input class="form-control" type="search" autofocus @bind="nameFilter" @bind:event="oninput" placeholder="Filter..." />
             </ColumnOptions>
         </PropertyColumn>
-        <PropertyColumn Property="@(p => p.EmailAddress)">
+        <PropertyColumn Property="@(p => p.EmailAddress)" Sortable="true" InitialSortDirection="SortDirection.Ascending">
             <ColumnOptions>
                 <input class="form-control" type="search" autofocus @bind="emailAddressFilter" @bind:event="oninput" placeholder="Filter..." />
             </ColumnOptions>
         </PropertyColumn>
-        <PropertyColumn Property="@(p => p.UserName)">
+        <PropertyColumn Property="@(p => p.UserName)" Sortable="true" InitialSortDirection="SortDirection.Descending">
             <ColumnOptions>
                     <input class="form-control" type="search" autofocus @bind="userNameFilter" @bind:event="oninput" placeholder="Filter..." />
             </ColumnOptions>
