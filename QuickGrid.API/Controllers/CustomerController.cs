@@ -21,17 +21,43 @@ namespace QuickGrid.API.Controllers
         }
 
         [HttpGet]
-        public async Task<IEnumerable<Customer>> Get()
+        public async Task<CustomersWrapper> Get([FromQuery]int skip, [FromQuery] int limit, [FromQuery] string? nameFilter, [FromQuery]string? emailAddressFilter, [FromQuery]string? userNameFilter)
         {
-            return await _appDbContext.Customers
+
+            var totalCustomerCount = await _appDbContext.Customers.CountAsync();
+            var customersQuery = _appDbContext.Customers.AsQueryable();
+                
+            if (!string.IsNullOrEmpty(nameFilter))
+            {
+                customersQuery = customersQuery.Where(c => c.FirstName.Contains(nameFilter) 
+                    || c.LastName.Contains(nameFilter));
+            }
+
+            if (!string.IsNullOrEmpty(emailAddressFilter))
+            {
+                customersQuery = customersQuery.Where(c => c.Email.Contains(emailAddressFilter));
+            }
+
+            if (!string.IsNullOrEmpty(userNameFilter))
+            {
+                customersQuery = customersQuery.Where(c => c.UserName.Contains(userNameFilter));
+            }
+
+            var customers = await customersQuery.Skip(skip)
+                .Take(limit)
                 .Select(c => new Customer
                 {
                     Name = c.FirstName + " " + c.LastName,
                     EmailAddress = c.Email,
                     UserName = c.UserName,
                     Avatar = c.Avatar
-                })
-                .ToListAsync();
+                }).ToListAsync();
+
+            return new CustomersWrapper
+            {
+                TotalCustomerCount = totalCustomerCount,
+                Customers = customers
+            };
         }
     }
 }

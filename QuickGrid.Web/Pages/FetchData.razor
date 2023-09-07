@@ -2,8 +2,10 @@
 
 @using Microsoft.AspNetCore.Components.QuickGrid
 @using QuickGrid.Shared.Dtos
+@using System.ComponentModel;
 
 @inject HttpClient Http
+@inject NavigationManager NavigationManager
 
 <PageTitle>Customers</PageTitle>
 
@@ -11,7 +13,7 @@
 
 <p>This component demonstrates fetching data from the server.</p>
 
-@if (customers == null)
+@if (customersProvider == null)
 {
     <p><em>Loading...</em></p>
 }
@@ -27,7 +29,7 @@ else
         </select>
     </div>
 
-    <QuickGrid Items="@filteredCustomers" Pagination="@paginationState" Virtualize="true">
+    <QuickGrid @ref="customersGrid" ItemsProvider="@customersProvider" Pagination="@paginationState" Virtualize="true">
         <TemplateColumn Title="Avatar">
             <img width="50" src="@context.Avatar" alt="Customer avatar" />
         </TemplateColumn>
@@ -47,6 +49,7 @@ else
             </ColumnOptions>
         </PropertyColumn>
     </QuickGrid>
+
 
     <div class="text-center">
         <div class="btn-group">
@@ -84,45 +87,76 @@ else
 }
 
 @code {
-    private PaginationState paginationState = new PaginationState { ItemsPerPage = 10 };
-    private IQueryable<Customer>? customers;
-    private IQueryable<Customer>? filteredCustomers
+    private QuickGrid<Customer?>? customersGrid;
+    private GridItemsProvider<Customer>? customersProvider;
+    private PaginationState paginationState = new PaginationState();
+
+    string? _nameFilter;
+    string? nameFilter
     {
         get
-       {
-            if (customers is null)
-            {
-                return null;
-            }
+        {
+            return _nameFilter;
+        }
 
-            var result = customers;
-
-            if (!string.IsNullOrEmpty(nameFilter))
-            {
-                result = result.Where(c => c.Name.ToLowerInvariant().Contains(nameFilter.ToLowerInvariant()));
-            }
-
-            if (!string.IsNullOrEmpty(emailAddressFilter))
-            {
-                result = result.Where(c => c.EmailAddress.ToLowerInvariant().Contains(emailAddressFilter.ToLowerInvariant()));
-            }
-
-            if (!string.IsNullOrEmpty(userNameFilter))
-            {
-                result = result.Where(c => c.UserName.ToLowerInvariant().Contains(userNameFilter.ToLowerInvariant()));
-            }
-
-            return result;
+        set
+        {
+            _nameFilter = value;
+            customersGrid?.RefreshDataAsync();
         }
     }
 
-    string nameFilter;
-    string emailAddressFilter;
-    string userNameFilter;
-
-    protected override async Task OnInitializedAsync()
+    string? _emailAddressFilter;
+    string? emailAddressFilter
     {
-        customers = Queryable.AsQueryable(await Http.GetFromJsonAsync<List<Customer>>("https://localhost:7111/Customer"));
+        get
+        {
+            return _emailAddressFilter;
+        }
+
+        set
+        {
+            _emailAddressFilter = value;
+            customersGrid?.RefreshDataAsync();
+        }
+    }
+
+    string? _userNameFilter;
+    string? userNameFilter
+    {
+        get
+        {
+            return _userNameFilter;
+        }
+
+        set
+        {
+            _userNameFilter = value;
+            customersGrid?.RefreshDataAsync();
+        }
+    }
+
+    protected override void OnInitialized()
+    {
+
         paginationState.TotalItemCountChanged += (sender, eventArgs) => StateHasChanged();
+
+        customersProvider = async req =>
+        {
+            var url = NavigationManager.GetUriWithQueryParameters("https://localhost:7111/Customer", new Dictionary<string, object?>
+            {
+                { "skip", req.StartIndex },
+                { "limit", req.Count },
+                { "nameFilter", nameFilter },
+                { "emailAddressFilter", emailAddressFilter },
+                { "userNameFilter", userNameFilter }
+            });
+
+            var response = await Http.GetFromJsonAsync<CustomersWrapper>(url, req.CancellationToken);
+
+            return GridItemsProviderResult.From(
+                items: response!.Customers,
+                totalItemCount: response!.TotalCustomerCount);
+        };
     }
 }
